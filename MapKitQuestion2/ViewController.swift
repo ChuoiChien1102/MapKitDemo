@@ -11,17 +11,14 @@ import CoreLocation
 // Extension to handle login success and update the toolbar
 extension ViewController: LoginViewControllerDelegate {
     
-    
     func didLoginSuccessfully() {
         isLoggedIn = true  // Update the login status
-        updateToolbar()     // Update the toolbar to show Option 2
+        setupToolbar(isLoggedIn: isLoggedIn)
     }
 }
 
 
 class ViewController: UIViewController, MKMapViewDelegate, LocationManagerDelegate, CLLocationManagerDelegate, LoginViewController.LoginViewControllerDelegate {
-    
-    
     
     var treasureManager = TreasureManager() // Treasure manager for handling treasure generation
     var locationManager = LocationManager()// Initialize LocationManager
@@ -47,8 +44,6 @@ class ViewController: UIViewController, MKMapViewDelegate, LocationManagerDelega
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
-        
         // Setup map view
         setupMapView()
         
@@ -58,11 +53,10 @@ class ViewController: UIViewController, MKMapViewDelegate, LocationManagerDelega
         locationManager.delegate = self
         
         // Setup UI components
-//        setupDifficultyControl()
+        setupDifficultyControl()
         setupLabels()
         setupTimerLabel()
         addRestartButton()
-        setupToolbar()  // Toolbar with buttons
         
         // Initialize the timer manager
         explorationTimerManager = ExplorationTimerManager(timeLimit: timeLimit, timerLabel: timerLabel) { [weak self] in
@@ -75,41 +69,6 @@ class ViewController: UIViewController, MKMapViewDelegate, LocationManagerDelega
         super.viewWillAppear(animated)
         navigationController?.isToolbarHidden = false
     }
-
-    
-    // Update toolbar whenever the login state changes
-    func updateToolbar() {
-        setupToolbar()  // Rebuild the toolbar based on the login state
-    }
-    
-    // Setup the toolbar with buttons
-    func setupToolbar() {
-        let toolbar = UIToolbar()
-        toolbar.frame = CGRect(x: 0, y: view.frame.height - 100, width: view.frame.width, height: 44)
-        
-        let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        
-        let button1 = UIBarButtonItem(title: "Option 1", style: .plain, target: self, action: #selector(toolbarButtonTapped(_:)))
-        
-        // Conditionally show Option 2 button only if the user is logged in
-        var toolbarItems = [button1, flexibleSpace]
-        
-        if isLoggedIn {
-            let button2 = UIBarButtonItem(title: "Option 2", style: .plain, target: self, action: #selector(toolbarButtonTapped(_:)))
-            toolbarItems.append(button2)
-            toolbarItems.append(flexibleSpace)
-        }
-        
-        let button3 = UIBarButtonItem(title: "Option 3", style: .plain, target: self, action: #selector(toolbarButtonTapped(_:)))
-        let button4 = UIBarButtonItem(title: "Option 4", style: .plain, target: self, action: #selector(toolbarButtonTapped(_:)))
-        
-        toolbarItems.append(contentsOf: [button3, flexibleSpace, button4])
-        
-        toolbar.items = toolbarItems
-        navigationController?.setToolbarHidden(false, animated: true)
-        view.addSubview(toolbar)
-
-    }
     
     // Setup the map view
     func setupMapView() {
@@ -120,29 +79,22 @@ class ViewController: UIViewController, MKMapViewDelegate, LocationManagerDelega
         self.view.addSubview(mapView)
     }
     
-    // Setup location manager and start location updates
-//    func setupLocationManager() {
-//        locationManager.desiredAccuracy = kCLLocationAccuracyBest
-//        locationManager.requestWhenInUseAuthorization() // Request authorization
-//        locationManager.startUpdatingLocation()
-//    }
-    
     // Setup difficulty control for treasure generation
-//    func setupDifficultyControl() {
-//        difficultyControl = UISegmentedControl(items: ["Easy", "Medium", "Hard"])
-//        difficultyControl.selectedSegmentIndex = 0
-//        difficultyControl.addTarget(self, action: #selector(difficultyChanged), for: .valueChanged)
-//        difficultyControl.frame = CGRect(x: 20, y: 50, width: view.frame.width - 40, height: 30)
-//        self.view.addSubview(difficultyControl)
-//        resetTimeLimit()
-//    }
+    func setupDifficultyControl() {
+        difficultyControl = UISegmentedControl(items: ["Easy", "Medium", "Hard"])
+        difficultyControl.selectedSegmentIndex = 0
+        difficultyControl.addTarget(self, action: #selector(difficultyChanged), for: .valueChanged)
+        difficultyControl.frame = CGRect(x: 20, y: 80, width: view.frame.width - 40, height: 30)
+        self.view.addSubview(difficultyControl)
+        resetTimeLimit()
+    }
     
     // Setup UI Labels for velocity, distance, time used, and time remaining
     func setupLabels() {
-        velocityLabel = createLabel(text: "Velocity: 0 m/s", yOffset: 100)
-        distanceLabel = createLabel(text: "Distance: 0 m", yOffset: 130)
-        timeUsedLabel = createLabel(text: "Time Used: 0 s", yOffset: 160)
-        timeRemainingLabel = createLabel(text: "Time Remaining: 0 s", yOffset: 190)
+        velocityLabel = createLabel(text: "Velocity: 0 m/s", yOffset: 130)
+        distanceLabel = createLabel(text: "Distance: 0 m", yOffset: 160)
+        timeUsedLabel = createLabel(text: "Time Used: 0 s", yOffset: 190)
+        timeRemainingLabel = createLabel(text: "Time Remaining: 0 s", yOffset: 220)
     }
     
     // Create label method to simplify label creation
@@ -163,7 +115,7 @@ class ViewController: UIViewController, MKMapViewDelegate, LocationManagerDelega
         timerLabel.font = UIFont.systemFont(ofSize: 16)
         timerLabel.textColor = .black
         timerLabel.textAlignment = .center
-        timerLabel.frame = CGRect(x: 20, y: 220, width: view.frame.width - 40, height: 30)
+        timerLabel.frame = CGRect(x: 20, y: 250, width: view.frame.width - 40, height: 30)
         self.view.addSubview(timerLabel)
     }
     
@@ -186,18 +138,6 @@ class ViewController: UIViewController, MKMapViewDelegate, LocationManagerDelega
         let region = MKCoordinateRegion(center: location.coordinate, latitudinalMeters: 500, longitudinalMeters: 500)
         mapView.setRegion(region, animated: true)
     }
-    
-    // CLLocationManagerDelegate method to handle authorization changes
-//    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-//        switch status {
-//        case .authorizedWhenInUse, .authorizedAlways:
-//            locationManager.startUpdatingLocation()
-//        case .denied, .restricted:
-//            print("Location permission denied")
-//        default:
-//            break
-//        }
-//    }
     
     // LocationManagerDelegate methods
     func didUpdateVelocity(_ velocity: Double) {
@@ -229,17 +169,20 @@ class ViewController: UIViewController, MKMapViewDelegate, LocationManagerDelega
     }
     
     // Difficulty changed
-//    @objc func difficultyChanged(sender: UISegmentedControl) {
-//        resetTimeLimit()
-//        timerLabel.text = "Time Remaining: \(timeLimit) seconds"
-//        explorationTimerManager?.invalidateTimers()
-//        
-//        // Generate treasures based on difficulty change
-//        treasureManager.generateRandomTreasures(from: locationManager.location?.coordinate ?? CLLocationCoordinate2D(), mapView: mapView) {
-//            // Start the timer after treasures are generated
-//            self.explorationTimerManager?.resetTimer(newTimeLimit: self.timeLimit)
-//        }
-//    }
+    @objc func difficultyChanged(sender: UISegmentedControl) {
+        collectedTreasures.removeAll()
+        resetTimeLimit()
+        timerLabel.text = "Time Remaining: \(timeLimit) seconds"
+        explorationTimerManager?.invalidateTimers()
+        
+        // Generate treasures based on difficulty change
+        treasureManager.generateRandomTreasures(from: locationManager.treasureLocation?.coordinate ?? CLLocationCoordinate2D(), mapView: mapView) {
+            // hardcode set treasureLocation
+            self.locationManager.setTreasureLocation(latitude: self.treasureManager.treasureLocations[2].latitude, longitude: self.treasureManager.treasureLocations[2].longitude, timeLimit: self.timeLimit)
+            // Start the timer after treasures are generated
+            self.explorationTimerManager?.resetTimer(newTimeLimit: self.timeLimit)
+        }
+    }
     
     // Reset the time limit based on the difficulty selected
     func resetTimeLimit() {
@@ -250,6 +193,14 @@ class ViewController: UIViewController, MKMapViewDelegate, LocationManagerDelega
         default: timeLimit = 600
         }
         explorationTimerManager?.resetTimer(newTimeLimit: timeLimit)
+    }
+    
+    // Reset label data
+    func resetDataLabel() {
+        velocityLabel.text = String(format: "Velocity: 0 m/s")
+        distanceLabel.text = String(format: "Distance: 0 m")
+        timeUsedLabel.text = String(format: "Time Used: 0 s")
+        timeRemainingLabel.text = String(format: "Time Remaining: 0 s")
     }
     
     // Alert when time limit is reached
@@ -263,14 +214,13 @@ class ViewController: UIViewController, MKMapViewDelegate, LocationManagerDelega
     @objc func restartGame() {
         collectedTreasures.removeAll()
         explorationTimerManager?.invalidateTimers()
-        
+        self.resetDataLabel()
         // Generate new treasures when restarting
         treasureManager.generateRandomTreasures(from: locationManager.treasureLocation?.coordinate ?? CLLocationCoordinate2D(), mapView: mapView) {
             // hardcode set treasureLocation
-            self.locationManager.treasureLocation = CLLocation(latitude: self.treasureManager.treasureLocations[2].latitude, longitude: self.treasureManager.treasureLocations[2].longitude)
-            // set start time
-            self.locationManager.startTime = Date()
+            self.locationManager.setTreasureLocation(latitude: self.treasureManager.treasureLocations[2].latitude, longitude: self.treasureManager.treasureLocations[2].longitude, timeLimit: self.timeLimit)
             self.explorationTimerManager?.resetTimer(newTimeLimit: self.timeLimit)
+            self.locationManager.locationMG.startUpdatingLocation()
         }
     }
 }

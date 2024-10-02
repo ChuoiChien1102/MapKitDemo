@@ -63,7 +63,7 @@ extension ViewController {
     }
 
     func navigateToTreasure(_ destination: CLLocationCoordinate2D) {
-        guard let userLocation = locationManager.clLocationManager.location?.coordinate else {
+        guard let userLocation = locationManager.locationMG.location?.coordinate else {
             print("User location not available")
             return
         }

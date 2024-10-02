@@ -18,7 +18,7 @@ protocol LocationManagerDelegate: AnyObject {
 
 class LocationManager: NSObject, CLLocationManagerDelegate {
     
-    var clLocationManager = CLLocationManager()
+    var locationMG = CLLocationManager()
     weak var delegate: LocationManagerDelegate?
     
     var treasureLocation: CLLocation?
@@ -29,8 +29,8 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
     
     override init() {
         super.init()
-        clLocationManager.delegate = self
-        clLocationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationMG.delegate = self
+        locationMG.desiredAccuracy = kCLLocationAccuracyBest
         checkLocationAuthorization()
     }
     
@@ -43,13 +43,13 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
     
     // Check location authorization
     func checkLocationAuthorization() {
-        switch clLocationManager.authorizationStatus {
+        switch locationMG.authorizationStatus {
         case .authorizedWhenInUse, .authorizedAlways:
-            clLocationManager.startUpdatingLocation()
+            print("Location access allowed.")
         case .denied:
             print("Location access denied.")
         case .notDetermined:
-            clLocationManager.requestWhenInUseAuthorization()
+            locationMG.requestWhenInUseAuthorization()
         case .restricted:
             print("Location access restricted.")
         @unknown default:
@@ -115,7 +115,7 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
                 if distanceRemaining <= 10 {
                     delegate?.didReachTreasure()
                     stopNoMovementTimer()
-                    clLocationManager.stopUpdatingLocation()
+                    locationMG.stopUpdatingLocation()
                 }
             }
         }
