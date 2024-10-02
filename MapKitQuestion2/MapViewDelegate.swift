@@ -52,7 +52,7 @@ extension ViewController {
 
             // Set the selected treasure to the new treasure
             selectedTreasure = treasureLocation
-
+            self.locationManager.setTreasureLocation(latitude: selectedTreasure!.latitude, longitude: selectedTreasure!.longitude, timeLimit: self.timeLimit)
             // Navigate to the selected treasure
             navigateToTreasure(treasureLocation)
 
@@ -93,15 +93,6 @@ extension ViewController {
             // Add the new polyline overlay
             self.currentPolyline = route.polyline
             self.mapView.addOverlay(self.currentPolyline!)
-        }
-        func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
-            if let polyline = overlay as? MKPolyline {
-                let renderer = MKPolylineRenderer(polyline: polyline)
-                renderer.strokeColor = UIColor.blue
-                renderer.lineWidth = 5.0
-                return renderer
-            }
-            return MKOverlayRenderer()
         }
     }
 }

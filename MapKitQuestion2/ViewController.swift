@@ -177,7 +177,7 @@ class ViewController: UIViewController, MKMapViewDelegate, LocationManagerDelega
         
         // Generate treasures based on difficulty change
         treasureManager.generateRandomTreasures(from: locationManager.treasureLocation?.coordinate ?? CLLocationCoordinate2D(), mapView: mapView) {
-            // hardcode set treasureLocation
+            // hardcode set treasure is 2nd element in treasureLocation
             self.locationManager.setTreasureLocation(latitude: self.treasureManager.treasureLocations[2].latitude, longitude: self.treasureManager.treasureLocations[2].longitude, timeLimit: self.timeLimit)
             // Start the timer after treasures are generated
             self.explorationTimerManager?.resetTimer(newTimeLimit: self.timeLimit)
@@ -217,7 +217,7 @@ class ViewController: UIViewController, MKMapViewDelegate, LocationManagerDelega
         self.resetDataLabel()
         // Generate new treasures when restarting
         treasureManager.generateRandomTreasures(from: locationManager.treasureLocation?.coordinate ?? CLLocationCoordinate2D(), mapView: mapView) {
-            // hardcode set treasureLocation
+            // hardcode set treasure is 2nd element in treasureLocation
             self.locationManager.setTreasureLocation(latitude: self.treasureManager.treasureLocations[2].latitude, longitude: self.treasureManager.treasureLocations[2].longitude, timeLimit: self.timeLimit)
             self.explorationTimerManager?.resetTimer(newTimeLimit: self.timeLimit)
             self.locationManager.locationMG.startUpdatingLocation()
