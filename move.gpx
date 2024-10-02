@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="YourAppName" xmlns="http://www.topografix.com/GPX/1/1">
+    <wpt lat="37.31766889833659" lon="-122.01343601587641">
+        <ele>10.46</ele>
+        <time>2024-09-25T03:08:06Z</time>
+        <name>Treasure 1</name>
+    </wpt>
+    <wpt lat="37.32936882185856" lon="-122.02132529478507">
+        <ele>10.46</ele>
+        <time>2024-09-25T03:08:56Z</time>
+        <name>Treasure 2</name>
+    </wpt>
+    <wpt lat="37.32669934407651" lon="-122.01939614348802">
+        <ele>10.46</ele>
+        <time>2024-09-25T03:09:08Z</time>
+        <name>Treasure 3</name>
+    </wpt>
+    <wpt lat="37.331631345379044" lon="-122.01436602025738">
+        <ele>10.46</ele>
+        <time>2024-09-25T03:09:38Z</time>
+        <name>Treasure 4</name>
+    </wpt>
+    <wpt lat="37.33348979653727" lon="-122.01819910546602">
+        <ele>10.46</ele>
+        <time>2024-09-25T03:09:51Z</time>
+        <name>Treasure 5</name>
+    </wpt>
+</gpx>
+
+
