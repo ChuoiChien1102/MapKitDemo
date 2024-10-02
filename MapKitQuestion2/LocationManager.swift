@@ -35,10 +35,11 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
     }
     
     // Function to set the target treasure location and reset tracking
-    func setTreasureLocation(latitude: Double, longitude: Double, timeLimit: TimeInterval) {
+    func setTreasureLocation(latitude: Double, longitude: Double, timeLimit: TimeInterval?) {
         treasureLocation = CLLocation(latitude: latitude, longitude: longitude)
-        startTime = Date() // Set the start time for tracking
-        totalTimeLimit = timeLimit
+        if timeLimit != nil {
+            totalTimeLimit = timeLimit!
+        }
     }
     
     // Check location authorization

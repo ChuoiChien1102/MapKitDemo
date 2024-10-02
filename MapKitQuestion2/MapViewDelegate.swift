@@ -52,7 +52,7 @@ extension ViewController {
 
             // Set the selected treasure to the new treasure
             selectedTreasure = treasureLocation
-            self.locationManager.setTreasureLocation(latitude: selectedTreasure!.latitude, longitude: selectedTreasure!.longitude, timeLimit: self.timeLimit)
+            self.locationManager.setTreasureLocation(latitude: selectedTreasure!.latitude, longitude: selectedTreasure!.longitude, timeLimit: nil)
             // Navigate to the selected treasure
             navigateToTreasure(treasureLocation)
 
