@@ -18,6 +18,8 @@ protocol LocationManagerDelegate: AnyObject {
 
 class LocationManager: NSObject, CLLocationManagerDelegate {
     
+    
+    
     var locationMG = CLLocationManager()
     weak var delegate: LocationManagerDelegate?
     
@@ -87,6 +89,14 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
         }
     }
     
+    func checkForTreasureProximity() {
+            // Your logic to check if the user is near the treasure
+            let reachedTreasure = true // Example condition
+
+            if reachedTreasure {
+                delegate?.didReachTreasure()  // Notify the delegate
+            }
+        }
     // MARK: - CLLocationManagerDelegate
     
     // Called when location updates are received
@@ -122,7 +132,7 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
         }
 
         // Step 5: Handle movement detection
-        if velocity < 0.5 {
+        if velocity < -1.5 {
             startNoMovementTimer()
         } else {
             stopNoMovementTimer()

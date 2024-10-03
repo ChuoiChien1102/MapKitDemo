@@ -22,6 +22,7 @@
 		00D71AC12CA3A644006C0A4C /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00D71AC02CA3A644006C0A4C /* LoginViewController.swift */; };
 		00D71AC32CA3A663006C0A4C /* storeFrontView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00D71AC22CA3A663006C0A4C /* storeFrontView.swift */; };
 		00D71AC52CA3D775006C0A4C /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00D71AC42CA3D775006C0A4C /* ProfileViewController.swift */; };
+		2786F5942CAE65560014A618 /* PointsViewWallet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2786F5932CAE65560014A618 /* PointsViewWallet.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,6 +43,7 @@
 		00D71AC02CA3A644006C0A4C /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		00D71AC22CA3A663006C0A4C /* storeFrontView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = storeFrontView.swift; sourceTree = "<group>"; };
 		00D71AC42CA3D775006C0A4C /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
+		2786F5932CAE65560014A618 /* PointsViewWallet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PointsViewWallet.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,6 +82,7 @@
 				00D71AB32CA27343006C0A4C /* LocationManager.swift */,
 				00D71AC42CA3D775006C0A4C /* ProfileViewController.swift */,
 				00D71AC22CA3A663006C0A4C /* storeFrontView.swift */,
+				2786F5932CAE65560014A618 /* PointsViewWallet.swift */,
 				00D71A9F2CA27224006C0A4C /* AppDelegate.swift */,
 				00D71AA12CA27224006C0A4C /* SceneDelegate.swift */,
 				00D71AA32CA27224006C0A4C /* ViewController.swift */,
@@ -174,6 +177,7 @@
 				00D71AA42CA27224006C0A4C /* ViewController.swift in Sources */,
 				00D71AA02CA27224006C0A4C /* AppDelegate.swift in Sources */,
 				00D71AB62CA37751006C0A4C /* TreasureManager.swift in Sources */,
+				2786F5942CAE65560014A618 /* PointsViewWallet.swift in Sources */,
 				00D71ABA2CA37A82006C0A4C /* ExplorationTimerManager.swift in Sources */,
 				00D71AC12CA3A644006C0A4C /* LoginViewController.swift in Sources */,
 				00D71AA22CA27224006C0A4C /* SceneDelegate.swift in Sources */,

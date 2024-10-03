@@ -8,6 +8,11 @@ import UIKit
 import MapKit
 import CoreLocation
 
+
+extension Notification.Name {
+    static let pointsUpdated = Notification.Name("pointsUpdated")
+}
+
 // Extension to handle login success and update the toolbar
 extension ViewController: LoginViewControllerDelegate {
     
@@ -24,6 +29,7 @@ class ViewController: UIViewController, MKMapViewDelegate, LocationManagerDelega
     var locationManager = LocationManager()// Initialize LocationManager
     var mapView: MKMapView! // MapView instance to display the map
     var explorationTimerManager: ExplorationTimerManager?
+    var pointsLabel: UILabel!
     var collectedTreasures: [CLLocationCoordinate2D] = []
     var difficultyControl: UISegmentedControl! // Difficulty control segmented UI
     var points: Int = 0
@@ -31,6 +37,9 @@ class ViewController: UIViewController, MKMapViewDelegate, LocationManagerDelega
     var timeLimit: TimeInterval = 1800
     var currentPolyline: MKPolyline?
     var selectedTreasure: CLLocationCoordinate2D?
+    var noMovementTimer: Timer?
+    let movementThreshold: Double = -2.00  // Velocity threshold in m/s
+    let noMovementDuration: TimeInterval = 10.0
     
     // UI Labels
     var velocityLabel: UILabel!
@@ -44,8 +53,12 @@ class ViewController: UIViewController, MKMapViewDelegate, LocationManagerDelega
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        
+        
         // Setup map view
         setupMapView()
+        
+        
         
         setupToolbar(isLoggedIn: isLoggedIn)
         
@@ -55,16 +68,30 @@ class ViewController: UIViewController, MKMapViewDelegate, LocationManagerDelega
         // Setup UI components
         setupDifficultyControl()
         setupLabels()
-        setupTimerLabel()
         addRestartButton()
+        
+        setupPointsLabel()
         
         // Initialize the timer manager
         explorationTimerManager = ExplorationTimerManager(timeLimit: timeLimit, timerLabel: timerLabel) { [weak self] in
             self?.timeLimitReached()
             self?.showNoMovementAlert()
+            
+            
         }
     }
-    
+
+        func setupPointsLabel(in containerView: UIView) {
+            pointsLabel = UILabel(frame: CGRect(x: 10, y: 10, width: 150, height: 40))
+            pointsLabel.text = "Points: 0"
+            containerView.addSubview(pointsLabel)
+        }
+
+        override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+            if let destinationVC = segue.destination as? StoreFrontViewController {
+                destinationVC.pointsLabel = pointsLabel
+            }
+        }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.isToolbarHidden = false
@@ -79,6 +106,34 @@ class ViewController: UIViewController, MKMapViewDelegate, LocationManagerDelega
         self.view.addSubview(mapView)
     }
     
+    // Add the dynamic points label to the top-right corner
+     func setupPointsLabel() {
+         pointsLabel = UILabel()
+         pointsLabel.text = "Points: \(points)"
+         pointsLabel.font = UIFont.boldSystemFont(ofSize: 18)
+         pointsLabel.textColor = .white
+         pointsLabel.textAlignment = .right
+         pointsLabel.backgroundColor = UIColor.black.withAlphaComponent(0.6)
+         pointsLabel.translatesAutoresizingMaskIntoConstraints = false
+         
+         view.addSubview(pointsLabel)
+         
+         // Set constraints for the points label (right under difficulty control)
+         NSLayoutConstraint.activate([
+             pointsLabel.topAnchor.constraint(equalTo: difficultyControl.bottomAnchor, constant: 10),
+             pointsLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+             pointsLabel.widthAnchor.constraint(equalToConstant: 100),
+             pointsLabel.heightAnchor.constraint(equalToConstant: 30)
+         ])
+     }
+    
+    
+    
+    
+    func updatePoints() {
+           points += 10
+           pointsLabel.text = "Points: \(points)"
+       }
     // Setup difficulty control for treasure generation
     func setupDifficultyControl() {
         difficultyControl = UISegmentedControl(items: ["Easy", "Medium", "Hard"])
@@ -108,16 +163,7 @@ class ViewController: UIViewController, MKMapViewDelegate, LocationManagerDelega
         return label
     }
     
-    // Setup the timer label just below the other information labels
-    func setupTimerLabel() {
-        timerLabel = UILabel()
-        timerLabel.text = "Time Remaining: \(timeLimit) seconds"
-        timerLabel.font = UIFont.systemFont(ofSize: 16)
-        timerLabel.textColor = .black
-        timerLabel.textAlignment = .center
-        timerLabel.frame = CGRect(x: 20, y: 250, width: view.frame.width - 40, height: 30)
-        self.view.addSubview(timerLabel)
-    }
+
     
     // Add a restart button in the bottom-right corner
     func addRestartButton() {
@@ -142,6 +188,12 @@ class ViewController: UIViewController, MKMapViewDelegate, LocationManagerDelega
     // LocationManagerDelegate methods
     func didUpdateVelocity(_ velocity: Double) {
         velocityLabel.text = String(format: "Velocity: %.2f m/s", velocity)
+        
+        if velocity < movementThreshold {
+            startNoMovementTimer()  // Start the timer when velocity is below the threshold
+        } else {
+            stopNoMovementTimer()   // Stop the timer if movement is detected
+        }
     }
     
     func didUpdateDistanceRemaining(_ distanceRemaining: Double) {
@@ -160,19 +212,36 @@ class ViewController: UIViewController, MKMapViewDelegate, LocationManagerDelega
         let alert = UIAlertController(title: "Treasure Found", message: "You reached the treasure!", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
         self.present(alert, animated: true, completion: nil)
+        
+        // Update points when treasure is found
+               updatePoints()
+        
     }
     
+    // MARK: - No Movement Logic
+        
+        func startNoMovementTimer() {
+            if noMovementTimer == nil {
+                // Start a timer for no movement detection
+                noMovementTimer = Timer.scheduledTimer(timeInterval: noMovementDuration, target: self, selector: #selector(showNoMovementAlert), userInfo: nil, repeats: false)
+            }
+        }
+
+        func stopNoMovementTimer() {
+            noMovementTimer?.invalidate()
+            noMovementTimer = nil  // Reset the timer
+        }
+    
     @objc func showNoMovementAlert() {
-        let alert = UIAlertController(title: "Get Moving", message: "You have not moved for 11 seconds!", preferredStyle: .alert)
+        let alert = UIAlertController(title: "No Movement Detected", message: "You haven't moved for a while. Please start moving to continue.", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-        self.present(alert, animated: true, completion: nil)
+        present(alert, animated: true, completion: nil)
     }
     
     // Difficulty changed
     @objc func difficultyChanged(sender: UISegmentedControl) {
         collectedTreasures.removeAll()
         resetTimeLimit()
-        timerLabel.text = "Time Remaining: \(timeLimit) seconds"
         explorationTimerManager?.invalidateTimers()
         
         // Generate treasures based on difficulty change
@@ -238,20 +307,20 @@ extension UIViewController {
         let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         
         // Toolbar buttons
-        let button1 = UIBarButtonItem(title: "Option 1", style: .plain, target: self, action: #selector(toolbarButtonTapped(_:)))
-        let button3 = UIBarButtonItem(title: "Option 3", style: .plain, target: self, action: #selector(toolbarButtonTapped(_:)))
-        let button4 = UIBarButtonItem(title: "Option 4", style: .plain, target: self, action: #selector(toolbarButtonTapped(_:)))
+        let button1 = UIBarButtonItem(title: "Login", style: .plain, target: self, action: #selector(toolbarButtonTapped(_:)))
+        let button3 = UIBarButtonItem(title: "Map", style: .plain, target: self, action: #selector(toolbarButtonTapped(_:)))
+    
 
         // Add Option 2 only if the user is logged in
         var toolbarItems = [button1, flexibleSpace]
         
         if isLoggedIn {
-            let button2 = UIBarButtonItem(title: "Option 2", style: .plain, target: self, action: #selector(toolbarButtonTapped(_:)))
+            let button2 = UIBarButtonItem(title: "Profile", style: .plain, target: self, action: #selector(toolbarButtonTapped(_:)))
             toolbarItems.append(button2)
             toolbarItems.append(flexibleSpace)
         }
         
-        toolbarItems.append(contentsOf: [button3, flexibleSpace, button4])
+        toolbarItems.append(contentsOf: [button3, flexibleSpace,])
         toolbar.setItems(toolbarItems, animated: false)
         
         // Add the toolbar to the view
@@ -267,18 +336,19 @@ extension UIViewController {
     }
     
     @objc func toolbarButtonTapped(_ sender: UIBarButtonItem) {
-        if sender.title == "Option 1" {
+        if sender.title == "Login" {
             let loginVC = LoginViewController()
             if let mainVC = self as? ViewController {
                 loginVC.delegate = mainVC  // Set the delegate to receive login success
             }
             navigationController?.pushViewController(loginVC, animated: true)
-        } else if sender.title == "Option 2" {
+        } else if sender.title == "Profile" {
             let profileVC = ProfileViewController()
             navigationController?.pushViewController(profileVC, animated: true)
-        } else if sender.title == "Option 3" {
+        } else if sender.title == "Map" {
             // Navigate back to the root view controller (ViewController)
             navigationController?.popToRootViewController(animated: true)
         }
+        
     }
 }

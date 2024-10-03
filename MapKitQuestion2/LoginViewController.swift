@@ -12,7 +12,7 @@ protocol LoginViewControllerDelegate: AnyObject {
 
 class LoginViewController: UIViewController {
     
-    weak var delegate: LoginViewControllerDelegate? 
+    weak var delegate: LoginViewControllerDelegate?
     
     // UI elements
     let usernameTextField = UITextField()
@@ -114,7 +114,16 @@ class LoginViewController: UIViewController {
                 present(alert, animated: true, completion: nil)
             }
         }
-       
+        // Simulate login action
+         @objc func performLogin() {
+             // Perform login logic here (e.g., authentication, validation)
+
+             // Notify delegate that login was successful
+             delegate?.didLoginSuccessfully()
+
+             // Navigate to Profile or any other view if needed
+             navigationController?.popViewController(animated: true)
+         }
+     }
     }
     
-}

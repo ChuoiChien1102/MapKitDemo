@@ -99,13 +99,13 @@ class TreasureManager {
 //              guard let self = self else { return }
 //              if isLand {
 //                  self.treasureLocations.append(treasureCoordinate)
-//                  
+//
 //                  let treasureAnnotation = MKPointAnnotation()
 //                  treasureAnnotation.coordinate = treasureCoordinate
 //                  treasureAnnotation.title = "Treasure"
 //                  mapView.addAnnotation(treasureAnnotation)
 //              }
-//              
+//
 //              // Recursively generate the next treasure
 //              self.generateTreasureRecursively(count: count - 1, userCoordinate: userCoordinate, mapView: mapView, completion: completion)
 //          }
