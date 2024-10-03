@@ -23,7 +23,7 @@ extension ViewController: LoginViewControllerDelegate {
 }
 
 
-class ViewController: UIViewController, MKMapViewDelegate, LocationManagerDelegate, CLLocationManagerDelegate, LoginViewController.LoginViewControllerDelegate {
+class ViewController: UIViewController, MKMapViewDelegate, LocationManagerDelegate, CLLocationManagerDelegate {
     
     var treasureManager = TreasureManager() // Treasure manager for handling treasure generation
     var locationManager = LocationManager()// Initialize LocationManager

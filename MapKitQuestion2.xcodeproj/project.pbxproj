@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 55;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -20,7 +20,7 @@
 		00D71ABC2CA38493006C0A4C /* move.gpx in Resources */ = {isa = PBXBuildFile; fileRef = 00D71ABB2CA38493006C0A4C /* move.gpx */; };
 		00D71ABF2CA39936006C0A4C /* move.gpx in Resources */ = {isa = PBXBuildFile; fileRef = 00D71ABE2CA39936006C0A4C /* move.gpx */; };
 		00D71AC12CA3A644006C0A4C /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00D71AC02CA3A644006C0A4C /* LoginViewController.swift */; };
-		00D71AC32CA3A663006C0A4C /* storeFrontView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00D71AC22CA3A663006C0A4C /* storeFrontView.swift */; };
+		00D71AC32CA3A663006C0A4C /* StoreFrontViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00D71AC22CA3A663006C0A4C /* StoreFrontViewController.swift */; };
 		00D71AC52CA3D775006C0A4C /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00D71AC42CA3D775006C0A4C /* ProfileViewController.swift */; };
 		2786F5942CAE65560014A618 /* PointsViewWallet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2786F5932CAE65560014A618 /* PointsViewWallet.swift */; };
 /* End PBXBuildFile section */
@@ -41,7 +41,7 @@
 		00D71ABB2CA38493006C0A4C /* move.gpx */ = {isa = PBXFileReference; lastKnownFileType = text; path = move.gpx; sourceTree = "<group>"; };
 		00D71ABE2CA39936006C0A4C /* move.gpx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = move.gpx; sourceTree = "<group>"; };
 		00D71AC02CA3A644006C0A4C /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
-		00D71AC22CA3A663006C0A4C /* storeFrontView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = storeFrontView.swift; sourceTree = "<group>"; };
+		00D71AC22CA3A663006C0A4C /* StoreFrontViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreFrontViewController.swift; sourceTree = "<group>"; };
 		00D71AC42CA3D775006C0A4C /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		2786F5932CAE65560014A618 /* PointsViewWallet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PointsViewWallet.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -81,7 +81,7 @@
 				00D71AC02CA3A644006C0A4C /* LoginViewController.swift */,
 				00D71AB32CA27343006C0A4C /* LocationManager.swift */,
 				00D71AC42CA3D775006C0A4C /* ProfileViewController.swift */,
-				00D71AC22CA3A663006C0A4C /* storeFrontView.swift */,
+				00D71AC22CA3A663006C0A4C /* StoreFrontViewController.swift */,
 				2786F5932CAE65560014A618 /* PointsViewWallet.swift */,
 				00D71A9F2CA27224006C0A4C /* AppDelegate.swift */,
 				00D71AA12CA27224006C0A4C /* SceneDelegate.swift */,
@@ -133,7 +133,7 @@
 				};
 			};
 			buildConfigurationList = 00D71A972CA27224006C0A4C /* Build configuration list for PBXProject "MapKitQuestion2" */;
-			compatibilityVersion = "Xcode 14.0";
+			compatibilityVersion = "Xcode 13.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -171,7 +171,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				00D71AB82CA3777B006C0A4C /* MapViewDelegate.swift in Sources */,
-				00D71AC32CA3A663006C0A4C /* storeFrontView.swift in Sources */,
+				00D71AC32CA3A663006C0A4C /* StoreFrontViewController.swift in Sources */,
 				00D71AC52CA3D775006C0A4C /* ProfileViewController.swift in Sources */,
 				00D71AB42CA27343006C0A4C /* LocationManager.swift in Sources */,
 				00D71AA42CA27224006C0A4C /* ViewController.swift in Sources */,

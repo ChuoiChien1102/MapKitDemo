@@ -1,23 +1,23 @@
 //
-//  storeFrontView.swift
+//  StoreFrontViewController.swift
 //  MapKitQuestion2
 //
 
 import UIKit
 
 class StoreFrontViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
-
+    
     var points: Int = 0
     var collectionView: UICollectionView!
     var locationManager: LocationManager!
-
+    
     var pointsLabel: UILabel! = {
         let label = UILabel()
         label.text = "Points: 0"
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -27,18 +27,18 @@ class StoreFrontViewController: UIViewController, UICollectionViewDelegate, UICo
         // Add pointsLabel to the view
         view.addSubview(pointsLabel)
         setupPointsLabelConstraints()
-
+        
         // Setup UICollectionView for grid
         setupCollectionView()
-
+        
         // Ensure navigationController is not nil and toolbar is shown
         navigationController?.isToolbarHidden = false
-        configureToolbar(isLoggedIn: true)  // Setup toolbar
-
+        configureToolbar()  // Setup toolbar
+        
         // Reload the collection view to display data
         collectionView.reloadData()
     }
-
+    
     // MARK: - Setup Points Label Constraints
     func setupPointsLabelConstraints() {
         NSLayoutConstraint.activate([
@@ -48,24 +48,24 @@ class StoreFrontViewController: UIViewController, UICollectionViewDelegate, UICo
             pointsLabel.heightAnchor.constraint(equalToConstant: 40)
         ])
     }
-
+    
     // MARK: - CollectionView Setup
     func setupCollectionView() {
         let layout = UICollectionViewFlowLayout()
         layout.itemSize = CGSize(width: view.frame.width / 2 - 20, height: view.frame.width / 2 - 20)
         layout.sectionInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
-
+        
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .white
         collectionView.delegate = self
         collectionView.dataSource = self
-
+        
         // Register a UICollectionViewCell class
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell")
         
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(collectionView)
-
+        
         // Add constraints to ensure the collection view doesn't overlap the label or the toolbar
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: pointsLabel.bottomAnchor, constant: 10),
@@ -74,28 +74,20 @@ class StoreFrontViewController: UIViewController, UICollectionViewDelegate, UICo
             collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -60)  // Reserve space for toolbar
         ])
     }
-
+    
     // MARK: - Toolbar Setup
-    func configureToolbar(isLoggedIn: Bool) {
+    func configureToolbar() {
         let toolbar = UIToolbar()
         toolbar.translatesAutoresizingMaskIntoConstraints = false
-
+        
         let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         
         // Toolbar buttons
-        let button1 = UIBarButtonItem(title: "Login", style: .plain, target: self, action: #selector(toolbarButtonTapped(_:)))
-        let button3 = UIBarButtonItem(title: "Map", style: .plain, target: self, action: #selector(toolbarButtonTapped(_:)))
-
-        // Add Option 2 only if the user is logged in
-        var toolbarItems = [button1, flexibleSpace]
+        let buttonMap = UIBarButtonItem(title: "Map", style: .plain, target: self, action: #selector(toolbarButtonTapped(_:)))
+        let buttonProfile = UIBarButtonItem(title: "Profile", style: .plain, target: self, action: #selector(toolbarButtonTapped(_:)))
         
-        if isLoggedIn {
-            let button2 = UIBarButtonItem(title: "Profile", style: .plain, target: self, action: #selector(toolbarButtonTapped(_:)))
-            toolbarItems.append(button2)
-            toolbarItems.append(flexibleSpace)
-        }
+        var toolbarItems = [buttonMap, flexibleSpace, buttonProfile]
         
-        toolbarItems.append(contentsOf: [button3, flexibleSpace])
         toolbar.setItems(toolbarItems, animated: false)
         
         // Add the toolbar to the view
@@ -109,16 +101,10 @@ class StoreFrontViewController: UIViewController, UICollectionViewDelegate, UICo
             toolbar.heightAnchor.constraint(equalToConstant: 44)
         ])
     }
-
+    
     // MARK: - Toolbar Button Actions
     @objc override func toolbarButtonTapped(_ sender: UIBarButtonItem) {
-        if sender.title == "Login" {
-            let loginVC = LoginViewController()
-            if let mainVC = self as? ViewController {
-                loginVC.delegate = mainVC  // Set the delegate to receive login success
-            }
-            navigationController?.pushViewController(loginVC, animated: true)
-        } else if sender.title == "Profile" {
+        if sender.title == "Profile" {
             let profileVC = ProfileViewController()
             navigationController?.pushViewController(profileVC, animated: true)
         } else if sender.title == "Map" {
@@ -127,16 +113,16 @@ class StoreFrontViewController: UIViewController, UICollectionViewDelegate, UICo
             navigationController?.pushViewController(mapVC, animated: true)
         }
     }
-
+    
     // MARK: - UICollectionView Methods
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return 8 // Display 8 items
     }
-
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
         cell.backgroundColor = .systemBlue
-
+        
         // Label for each item
         let label = UILabel(frame: cell.contentView.bounds)
         label.text = "Item \(indexPath.item + 1)"
@@ -144,10 +130,10 @@ class StoreFrontViewController: UIViewController, UICollectionViewDelegate, UICo
         label.textColor = .white
         label.font = UIFont.boldSystemFont(ofSize: 16)
         cell.contentView.addSubview(label)
-
+        
         return cell
     }
-
+    
     // MARK: - DidSelectItemAt for Cell Selection
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         // Display the first alert asking if the user wants to purchase

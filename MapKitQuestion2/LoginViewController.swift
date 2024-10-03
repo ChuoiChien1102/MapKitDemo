@@ -59,8 +59,12 @@ class LoginViewController: UIViewController {
         
         if username == hardcodedUsername && password == hardcodedPassword {
             // Navigate to StoreFrontView
+            let window = (UIApplication.shared.connectedScenes.first!.delegate as! SceneDelegate).window
             let storeFrontVC = StoreFrontViewController()
-            navigationController?.pushViewController(storeFrontVC, animated: true)
+            let navigationController = UINavigationController(rootViewController: storeFrontVC)
+            // Set the initial view controller
+            window?.rootViewController = navigationController
+            window?.makeKeyAndVisible()
         } else {
             // Show an alert for incorrect credentials
             let alert = UIAlertController(title: "Error", message: "Invalid username or password", preferredStyle: .alert)
@@ -68,62 +72,5 @@ class LoginViewController: UIViewController {
             present(alert, animated: true, completion: nil)
         }
     }
-    
-    protocol LoginViewControllerDelegate: AnyObject {
-        func didLoginSuccessfully()
-    }
-    
-    class LoginViewController: UIViewController {
-        
-        weak var delegate: LoginViewControllerDelegate?
-        
-        // UI elements
-        let usernameTextField = UITextField()
-        let passwordTextField = UITextField()
-        let loginButton = UIButton(type: .system)
-        
-        override func viewDidLoad() {
-            super.viewDidLoad()
-            
-            view.backgroundColor = .white
-            title = "Login"
-            setupUI()
-        }
-        
-        // Setup the UI for the login form
-        func setupUI() {
-            // Username and password setup...
-        }
-        
-        @objc func handleLogin() {
-            let hardcodedUsername = "user123"
-            let hardcodedPassword = "password123"
-            
-            guard let username = usernameTextField.text, let password = passwordTextField.text else { return }
-            
-            if username == hardcodedUsername && password == hardcodedPassword {
-                // Notify delegate on successful login
-                delegate?.didLoginSuccessfully()
-                // Navigate to the StoreFrontViewController
-                           let storeFrontVC = StoreFrontViewController()
-                           navigationController?.pushViewController(storeFrontVC, animated: true)
-            } else {
-                // Show an alert for incorrect credentials
-                let alert = UIAlertController(title: "Error", message: "Invalid username or password", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-                present(alert, animated: true, completion: nil)
-            }
-        }
-        // Simulate login action
-         @objc func performLogin() {
-             // Perform login logic here (e.g., authentication, validation)
+}
 
-             // Notify delegate that login was successful
-             delegate?.didLoginSuccessfully()
-
-             // Navigate to Profile or any other view if needed
-             navigationController?.popViewController(animated: true)
-         }
-     }
-    }
-    
