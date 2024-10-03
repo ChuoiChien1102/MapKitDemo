@@ -5,11 +5,9 @@
 
 import UIKit
 
-class StoreFrontViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
+class StoreFrontViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, LocationManagerDelegate{
     
-    var points: Int = 0
     var collectionView: UICollectionView!
-    var locationManager: LocationManager!
     
     var pointsLabel: UILabel! = {
         let label = UILabel()
@@ -23,6 +21,9 @@ class StoreFrontViewController: UIViewController, UICollectionViewDelegate, UICo
         
         view.backgroundColor = .white
         title = "Store Front"
+        
+        // Set Location Manager delegate
+        LocationManager.shared.delegate = self
         
         // Add pointsLabel to the view
         view.addSubview(pointsLabel)
@@ -39,6 +40,15 @@ class StoreFrontViewController: UIViewController, UICollectionViewDelegate, UICo
         collectionView.reloadData()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        updateLabelPoints()
+    }
+    
+    func updateLabelPoints() {
+        pointsLabel.text = "Points: \(UserModel.shared.point)"
+    }
+    
     // MARK: - Setup Points Label Constraints
     func setupPointsLabelConstraints() {
         NSLayoutConstraint.activate([
@@ -47,6 +57,31 @@ class StoreFrontViewController: UIViewController, UICollectionViewDelegate, UICo
             pointsLabel.widthAnchor.constraint(equalToConstant: 150),
             pointsLabel.heightAnchor.constraint(equalToConstant: 40)
         ])
+    }
+    
+    // LocationManagerDelegate methods
+    func didUpdateVelocity(_ velocity: Double) {
+        
+    }
+    
+    func didUpdateDistanceRemaining(_ distanceRemaining: Double) {
+        
+    }
+    
+    func didUpdateTimeUsed(_ timeUsed: Double) {
+        
+    }
+    
+    func didUpdateTimeRemaining(_ timeRemaining: Double) {
+        
+    }
+    
+    func didReachTreasure() {
+        updateLabelPoints()
+    }
+    
+    func showNoMovementAlert() {
+        
     }
     
     // MARK: - CollectionView Setup
@@ -109,7 +144,6 @@ class StoreFrontViewController: UIViewController, UICollectionViewDelegate, UICo
             navigationController?.pushViewController(profileVC, animated: true)
         } else if sender.title == "Map" {
             let mapVC = MapViewController()
-            mapVC.isLoggedIn = true
             navigationController?.pushViewController(mapVC, animated: true)
         }
     }
@@ -137,11 +171,19 @@ class StoreFrontViewController: UIViewController, UICollectionViewDelegate, UICo
     // MARK: - DidSelectItemAt for Cell Selection
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         // Display the first alert asking if the user wants to purchase
-        let alert = UIAlertController(title: "Purchase", message: "Do you want to purchase for 10 cash?", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Purchase", message: "Do you want to purchase for 10 point?", preferredStyle: .alert)
         
         // "Yes" action
         let yesAction = UIAlertAction(title: "Yes", style: .default) { _ in
             // Show another alert indicating the item has been purchased
+            if UserModel.shared.point < 10 {
+                let purchaseAlert = UIAlertController(title: "Don't enough point!", message: nil, preferredStyle: .alert)
+                purchaseAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+                self.present(purchaseAlert, animated: true, completion: nil)
+                return
+            }
+            UserModel.shared.point -= 10
+            self.updateLabelPoints()
             let purchaseAlert = UIAlertController(title: "Purchased!", message: nil, preferredStyle: .alert)
             purchaseAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
             self.present(purchaseAlert, animated: true, completion: nil)

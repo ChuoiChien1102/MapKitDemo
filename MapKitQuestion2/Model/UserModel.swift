@@ -11,7 +11,7 @@ class UserModel {
     static let shared = UserModel()
     var userName: String?
     var passWord: String?
-    var point: Int?
+    var point = 0
     var isLogin = false
     
     private init() { }

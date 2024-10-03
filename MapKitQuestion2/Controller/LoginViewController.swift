@@ -22,8 +22,6 @@ class LoginViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setupToolbar(isLoggedIn: false)
-        
         view.backgroundColor = .white
         setupUI()
     }
@@ -58,6 +56,7 @@ class LoginViewController: UIViewController {
         guard let username = usernameTextField.text, let password = passwordTextField.text else { return }
         
         if username == hardcodedUsername && password == hardcodedPassword {
+            UserModel.shared.isLogin = true
             // Navigate to StoreFrontView
             let window = (UIApplication.shared.connectedScenes.first!.delegate as! SceneDelegate).window
             let storeFrontVC = StoreFrontViewController()

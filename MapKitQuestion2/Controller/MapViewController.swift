@@ -8,17 +8,11 @@ import UIKit
 import MapKit
 import CoreLocation
 
-
-extension Notification.Name {
-    static let pointsUpdated = Notification.Name("pointsUpdated")
-}
-
 // Extension to handle login success and update the toolbar
 extension MapViewController: LoginViewControllerDelegate {
     
     func didLoginSuccessfully() {
-        isLoggedIn = true  // Update the login status
-        setupToolbar(isLoggedIn: isLoggedIn)
+        setupToolbar()
     }
 }
 
@@ -26,13 +20,11 @@ extension MapViewController: LoginViewControllerDelegate {
 class MapViewController: UIViewController, MKMapViewDelegate, LocationManagerDelegate, CLLocationManagerDelegate {
     
     var treasureManager = TreasureManager() // Treasure manager for handling treasure generation
-    var locationManager = LocationManager()// Initialize LocationManager
     var mapView: MKMapView! // MapView instance to display the map
     var explorationTimerManager: ExplorationTimerManager?
     var pointsLabel: UILabel!
     var collectedTreasures: [CLLocationCoordinate2D] = []
     var difficultyControl: UISegmentedControl! // Difficulty control segmented UI
-    var points: Int = 0
     var timerLabel: UILabel!
     var timeLimit: TimeInterval = 1800
     var currentPolyline: MKPolyline?
@@ -47,23 +39,16 @@ class MapViewController: UIViewController, MKMapViewDelegate, LocationManagerDel
     var timeUsedLabel: UILabel!
     var timeRemainingLabel: UILabel!
     
-    // Track login status
-    var isLoggedIn: Bool = false
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        
         
         // Setup map view
         setupMapView()
         
-        
-        
-        setupToolbar(isLoggedIn: isLoggedIn)
+        setupToolbar()
         
         // Set Location Manager delegate
-        locationManager.delegate = self
+        LocationManager.shared.delegate = self
         
         // Setup UI components
         setupDifficultyControl()
@@ -80,21 +65,22 @@ class MapViewController: UIViewController, MKMapViewDelegate, LocationManagerDel
             
         }
     }
-
-        func setupPointsLabel(in containerView: UIView) {
-            pointsLabel = UILabel(frame: CGRect(x: 10, y: 10, width: 150, height: 40))
-            pointsLabel.text = "Points: 0"
-            containerView.addSubview(pointsLabel)
+    
+    func setupPointsLabel(in containerView: UIView) {
+        pointsLabel = UILabel(frame: CGRect(x: 10, y: 10, width: 150, height: 40))
+        pointsLabel.text = "Points: 0"
+        containerView.addSubview(pointsLabel)
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let destinationVC = segue.destination as? StoreFrontViewController {
+            destinationVC.pointsLabel = pointsLabel
         }
-
-        override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-            if let destinationVC = segue.destination as? StoreFrontViewController {
-                destinationVC.pointsLabel = pointsLabel
-            }
-        }
+    }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.isToolbarHidden = false
+        updateLabelPoints()
     }
     
     // Setup the map view
@@ -107,33 +93,30 @@ class MapViewController: UIViewController, MKMapViewDelegate, LocationManagerDel
     }
     
     // Add the dynamic points label to the top-right corner
-     func setupPointsLabel() {
-         pointsLabel = UILabel()
-         pointsLabel.text = "Points: \(points)"
-         pointsLabel.font = UIFont.boldSystemFont(ofSize: 18)
-         pointsLabel.textColor = .white
-         pointsLabel.textAlignment = .right
-         pointsLabel.backgroundColor = UIColor.black.withAlphaComponent(0.6)
-         pointsLabel.translatesAutoresizingMaskIntoConstraints = false
-         
-         view.addSubview(pointsLabel)
-         
-         // Set constraints for the points label (right under difficulty control)
-         NSLayoutConstraint.activate([
-             pointsLabel.topAnchor.constraint(equalTo: difficultyControl.bottomAnchor, constant: 10),
-             pointsLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-             pointsLabel.widthAnchor.constraint(equalToConstant: 100),
-             pointsLabel.heightAnchor.constraint(equalToConstant: 30)
-         ])
-     }
+    func setupPointsLabel() {
+        pointsLabel = UILabel()
+        pointsLabel.text = "Points: \(UserModel.shared.point)"
+        pointsLabel.font = UIFont.boldSystemFont(ofSize: 18)
+        pointsLabel.textColor = .white
+        pointsLabel.textAlignment = .right
+        pointsLabel.backgroundColor = UIColor.black.withAlphaComponent(0.6)
+        pointsLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        view.addSubview(pointsLabel)
+        
+        // Set constraints for the points label (right under difficulty control)
+        NSLayoutConstraint.activate([
+            pointsLabel.topAnchor.constraint(equalTo: difficultyControl.bottomAnchor, constant: 10),
+            pointsLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            pointsLabel.widthAnchor.constraint(equalToConstant: 100),
+            pointsLabel.heightAnchor.constraint(equalToConstant: 30)
+        ])
+    }
     
     
-    
-    
-    func updatePoints() {
-           points += 10
-           pointsLabel.text = "Points: \(points)"
-       }
+    func updateLabelPoints() {
+        pointsLabel.text = "Points: \(UserModel.shared.point)"
+    }
     // Setup difficulty control for treasure generation
     func setupDifficultyControl() {
         difficultyControl = UISegmentedControl(items: ["Easy", "Medium", "Hard"])
@@ -150,6 +133,7 @@ class MapViewController: UIViewController, MKMapViewDelegate, LocationManagerDel
         distanceLabel = createLabel(text: "Distance: 0 m", yOffset: 160)
         timeUsedLabel = createLabel(text: "Time Used: 0 s", yOffset: 190)
         timeRemainingLabel = createLabel(text: "Time Remaining: 0 s", yOffset: 220)
+        showLabelData(isShow: false)
     }
     
     // Create label method to simplify label creation
@@ -163,7 +147,19 @@ class MapViewController: UIViewController, MKMapViewDelegate, LocationManagerDel
         return label
     }
     
-
+    func showLabelData(isShow: Bool) {
+        if isShow {
+            velocityLabel.isHidden = false
+            distanceLabel.isHidden = false
+            timeUsedLabel.isHidden = false
+            timeRemainingLabel.isHidden = false
+        } else {
+            velocityLabel.isHidden = true
+            distanceLabel.isHidden = true
+            timeUsedLabel.isHidden = true
+            timeRemainingLabel.isHidden = true
+        }
+    }
     
     // Add a restart button in the bottom-right corner
     func addRestartButton() {
@@ -214,23 +210,22 @@ class MapViewController: UIViewController, MKMapViewDelegate, LocationManagerDel
         self.present(alert, animated: true, completion: nil)
         
         // Update points when treasure is found
-               updatePoints()
-        
+        updateLabelPoints()
     }
     
     // MARK: - No Movement Logic
-        
-        func startNoMovementTimer() {
-            if noMovementTimer == nil {
-                // Start a timer for no movement detection
-                noMovementTimer = Timer.scheduledTimer(timeInterval: noMovementDuration, target: self, selector: #selector(showNoMovementAlert), userInfo: nil, repeats: false)
-            }
+    
+    func startNoMovementTimer() {
+        if noMovementTimer == nil {
+            // Start a timer for no movement detection
+            noMovementTimer = Timer.scheduledTimer(timeInterval: noMovementDuration, target: self, selector: #selector(showNoMovementAlert), userInfo: nil, repeats: false)
         }
-
-        func stopNoMovementTimer() {
-            noMovementTimer?.invalidate()
-            noMovementTimer = nil  // Reset the timer
-        }
+    }
+    
+    func stopNoMovementTimer() {
+        noMovementTimer?.invalidate()
+        noMovementTimer = nil  // Reset the timer
+    }
     
     @objc func showNoMovementAlert() {
         let alert = UIAlertController(title: "No Movement Detected", message: "You haven't moved for a while. Please start moving to continue.", preferredStyle: .alert)
@@ -245,11 +240,9 @@ class MapViewController: UIViewController, MKMapViewDelegate, LocationManagerDel
         explorationTimerManager?.invalidateTimers()
         
         // Generate treasures based on difficulty change
-        treasureManager.generateRandomTreasures(from: locationManager.treasureLocation?.coordinate ?? CLLocationCoordinate2D(), mapView: mapView) {
-            // hardcode set treasure is 2nd element in treasureLocation
-            self.locationManager.setTreasureLocation(latitude: self.treasureManager.treasureLocations[2].latitude, longitude: self.treasureManager.treasureLocations[2].longitude, timeLimit: self.timeLimit)
+        treasureManager.generateRandomTreasures(from: LocationManager.shared.treasureLocation?.coordinate ?? CLLocationCoordinate2D(), mapView: mapView) {
             // Start the timer after treasures are generated
-            self.locationManager.startTime = Date()
+            LocationManager.shared.startTime = Date()
             self.explorationTimerManager?.resetTimer(newTimeLimit: self.timeLimit)
         }
     }
@@ -287,23 +280,20 @@ class MapViewController: UIViewController, MKMapViewDelegate, LocationManagerDel
         self.resetDataLabel()
         self.resetTimeLimit()
         // Generate new treasures when restarting
-        treasureManager.generateRandomTreasures(from: locationManager.treasureLocation?.coordinate ?? CLLocationCoordinate2D(), mapView: mapView) {
-            // hardcode set treasure is 2nd element in treasureLocation
-            self.locationManager.setTreasureLocation(latitude: self.treasureManager.treasureLocations[2].latitude, longitude: self.treasureManager.treasureLocations[2].longitude, timeLimit: self.timeLimit)
-            // Start the timer after treasures are generated
-            self.locationManager.startTime = Date()
+        treasureManager.generateRandomTreasures(from: LocationManager.shared.treasureLocation?.coordinate ?? CLLocationCoordinate2D(), mapView: mapView) {
+            LocationManager.shared.startTime = Date()
             self.explorationTimerManager?.resetTimer(newTimeLimit: self.timeLimit)
-            self.locationManager.locationMG.startUpdatingLocation()
+            LocationManager.shared.locationMG.startUpdatingLocation()
         }
     }
 }
 
 extension UIViewController {
     
-    func setupToolbar(isLoggedIn: Bool) {
+    func setupToolbar() {
         let toolbar = UIToolbar()
         toolbar.translatesAutoresizingMaskIntoConstraints = false
-
+        
         let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         
         // Toolbar buttons

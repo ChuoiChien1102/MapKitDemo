@@ -39,6 +39,8 @@ extension MapViewController {
         
         // Reset the selected treasure to nil (to track that no treasure is currently selected)
         selectedTreasure = nil
+        LocationManager.shared.treasureLocation = nil
+        showLabelData(isShow: false)
     }
 
     // Handle selection of map annotations (e.g., treasures)
@@ -52,7 +54,8 @@ extension MapViewController {
 
             // Set the selected treasure to the new treasure
             selectedTreasure = treasureLocation
-            self.locationManager.setTreasureLocation(latitude: selectedTreasure!.latitude, longitude: selectedTreasure!.longitude, timeLimit: nil)
+            LocationManager.shared.setTreasureLocation(latitude: selectedTreasure!.latitude, longitude: selectedTreasure!.longitude, timeLimit: nil)
+            showLabelData(isShow: true)
             // Navigate to the selected treasure
             navigateToTreasure(treasureLocation)
 
@@ -63,7 +66,7 @@ extension MapViewController {
     }
 
     func navigateToTreasure(_ destination: CLLocationCoordinate2D) {
-        guard let userLocation = locationManager.locationMG.location?.coordinate else {
+        guard let userLocation = LocationManager.shared.locationMG.location?.coordinate else {
             print("User location not available")
             return
         }

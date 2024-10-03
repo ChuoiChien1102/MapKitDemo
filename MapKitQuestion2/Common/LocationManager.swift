@@ -17,8 +17,7 @@ protocol LocationManagerDelegate: AnyObject {
 }
 
 class LocationManager: NSObject, CLLocationManagerDelegate {
-    
-    
+    static let shared = LocationManager()
     
     var locationMG = CLLocationManager()
     weak var delegate: LocationManagerDelegate?
@@ -29,7 +28,7 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
     var noMovementTimer: Timer?
     let noMovementDuration: TimeInterval = 11.0 // Time limit for detecting no movement
     
-    override init() {
+    private override init() {
         super.init()
         locationMG.delegate = self
         locationMG.desiredAccuracy = kCLLocationAccuracyBest
@@ -124,6 +123,7 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
 
                 // Step 4: If the user has reached the treasure (within 10 meters)
                 if distanceRemaining <= 10 {
+                    UserModel.shared.point += 10
                     delegate?.didReachTreasure()
                     stopNoMovementTimer()
                     locationMG.stopUpdatingLocation()
