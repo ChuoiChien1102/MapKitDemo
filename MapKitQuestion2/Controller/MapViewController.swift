@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  MapViewController.swift
 //  MapKitQuestion2
 //
 //
@@ -14,7 +14,7 @@ extension Notification.Name {
 }
 
 // Extension to handle login success and update the toolbar
-extension ViewController: LoginViewControllerDelegate {
+extension MapViewController: LoginViewControllerDelegate {
     
     func didLoginSuccessfully() {
         isLoggedIn = true  // Update the login status
@@ -23,7 +23,7 @@ extension ViewController: LoginViewControllerDelegate {
 }
 
 
-class ViewController: UIViewController, MKMapViewDelegate, LocationManagerDelegate, CLLocationManagerDelegate {
+class MapViewController: UIViewController, MKMapViewDelegate, LocationManagerDelegate, CLLocationManagerDelegate {
     
     var treasureManager = TreasureManager() // Treasure manager for handling treasure generation
     var locationManager = LocationManager()// Initialize LocationManager
@@ -307,21 +307,19 @@ extension UIViewController {
         let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         
         // Toolbar buttons
-        let button1 = UIBarButtonItem(title: "Login", style: .plain, target: self, action: #selector(toolbarButtonTapped(_:)))
-        let button3 = UIBarButtonItem(title: "Map", style: .plain, target: self, action: #selector(toolbarButtonTapped(_:)))
-    
-
-        // Add Option 2 only if the user is logged in
-        var toolbarItems = [button1, flexibleSpace]
-        
-        if isLoggedIn {
-            let button2 = UIBarButtonItem(title: "Profile", style: .plain, target: self, action: #selector(toolbarButtonTapped(_:)))
-            toolbarItems.append(button2)
-            toolbarItems.append(flexibleSpace)
+        if UserModel.shared.isLogin {
+            // if user is login
+            let buttonProfile = UIBarButtonItem(title: "Profile", style: .plain, target: self, action: #selector(toolbarButtonTapped(_:)))
+            let buttonMap = UIBarButtonItem(title: "Map", style: .plain, target: self, action: #selector(toolbarButtonTapped(_:)))
+            let toolbarItems = [buttonProfile, flexibleSpace, buttonMap]
+            toolbar.setItems(toolbarItems, animated: false)
+        } else {
+            // If user no login
+            let buttonLogin = UIBarButtonItem(title: "Login", style: .plain, target: self, action: #selector(toolbarButtonTapped(_:)))
+            let buttonMap = UIBarButtonItem(title: "Map", style: .plain, target: self, action: #selector(toolbarButtonTapped(_:)))
+            let toolbarItems = [buttonLogin, flexibleSpace, buttonMap]
+            toolbar.setItems(toolbarItems, animated: false)
         }
-        
-        toolbarItems.append(contentsOf: [button3, flexibleSpace,])
-        toolbar.setItems(toolbarItems, animated: false)
         
         // Add the toolbar to the view
         view.addSubview(toolbar)
@@ -338,7 +336,7 @@ extension UIViewController {
     @objc func toolbarButtonTapped(_ sender: UIBarButtonItem) {
         if sender.title == "Login" {
             let loginVC = LoginViewController()
-            if let mainVC = self as? ViewController {
+            if let mainVC = self as? MapViewController {
                 loginVC.delegate = mainVC  // Set the delegate to receive login success
             }
             navigationController?.pushViewController(loginVC, animated: true)

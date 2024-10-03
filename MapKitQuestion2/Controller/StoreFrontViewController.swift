@@ -83,10 +83,10 @@ class StoreFrontViewController: UIViewController, UICollectionViewDelegate, UICo
         let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         
         // Toolbar buttons
-        let buttonMap = UIBarButtonItem(title: "Map", style: .plain, target: self, action: #selector(toolbarButtonTapped(_:)))
         let buttonProfile = UIBarButtonItem(title: "Profile", style: .plain, target: self, action: #selector(toolbarButtonTapped(_:)))
+        let buttonMap = UIBarButtonItem(title: "Map", style: .plain, target: self, action: #selector(toolbarButtonTapped(_:)))
         
-        var toolbarItems = [buttonMap, flexibleSpace, buttonProfile]
+        let toolbarItems = [buttonProfile, flexibleSpace, buttonMap]
         
         toolbar.setItems(toolbarItems, animated: false)
         
@@ -108,7 +108,7 @@ class StoreFrontViewController: UIViewController, UICollectionViewDelegate, UICo
             let profileVC = ProfileViewController()
             navigationController?.pushViewController(profileVC, animated: true)
         } else if sender.title == "Map" {
-            let mapVC = ViewController()
+            let mapVC = MapViewController()
             mapVC.isLoggedIn = true
             navigationController?.pushViewController(mapVC, animated: true)
         }

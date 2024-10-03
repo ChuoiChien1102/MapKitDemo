@@ -14,7 +14,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard (scene is UIWindowScene) else { return }
         
         // Create a new UIWindow instance with the windowScene
-        let mainVC = ViewController()
+        let mainVC = MapViewController()
         let navigationController = UINavigationController(rootViewController: mainVC)
         
         // Set the initial view controller

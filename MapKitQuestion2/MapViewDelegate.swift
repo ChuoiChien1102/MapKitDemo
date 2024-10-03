@@ -13,7 +13,7 @@ extension CLLocationCoordinate2D: Equatable {
     }
 }
 
-extension ViewController {
+extension MapViewController {
     
     // MKMapViewDelegate method to render polylines
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
