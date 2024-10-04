@@ -5,7 +5,7 @@
 
 import UIKit
 
-class StoreFrontViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, LocationManagerDelegate{
+class StoreFrontViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, LocationManagerToStoreVCDelegate {
     
     var collectionView: UICollectionView!
     
@@ -16,6 +16,8 @@ class StoreFrontViewController: UIViewController, UICollectionViewDelegate, UICo
         return label
     }()
     
+    let listItems = [Item(name: "Camry", point: 20), Item(name: "Accent", point: 5), Item(name: "Mercedes", point: 30), Item(name: "Vios", point: 5), Item(name: "Honda City", point: 5), Item(name: "Honda Civic", point: 10), Item(name: "Honda CRV", point: 15), Item(name: "Madza 3", point: 10), Item(name: "Madza 6", point: 15)]
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -23,7 +25,7 @@ class StoreFrontViewController: UIViewController, UICollectionViewDelegate, UICo
         title = "Store Front"
         
         // Set Location Manager delegate
-        LocationManager.shared.delegate = self
+        LocationManager.shared.toStoreVCdelegate = self
         
         // Add pointsLabel to the view
         view.addSubview(pointsLabel)
@@ -35,9 +37,6 @@ class StoreFrontViewController: UIViewController, UICollectionViewDelegate, UICo
         // Ensure navigationController is not nil and toolbar is shown
         navigationController?.isToolbarHidden = false
         configureToolbar()  // Setup toolbar
-        
-        // Reload the collection view to display data
-        collectionView.reloadData()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -59,29 +58,9 @@ class StoreFrontViewController: UIViewController, UICollectionViewDelegate, UICo
         ])
     }
     
-    // LocationManagerDelegate methods
-    func didUpdateVelocity(_ velocity: Double) {
-        
-    }
-    
-    func didUpdateDistanceRemaining(_ distanceRemaining: Double) {
-        
-    }
-    
-    func didUpdateTimeUsed(_ timeUsed: Double) {
-        
-    }
-    
-    func didUpdateTimeRemaining(_ timeRemaining: Double) {
-        
-    }
-    
+    // LocationManagerToStoreVCDelegate methods
     func didReachTreasure() {
         updateLabelPoints()
-    }
-    
-    func showNoMovementAlert() {
-        
     }
     
     // MARK: - CollectionView Setup
@@ -96,8 +75,8 @@ class StoreFrontViewController: UIViewController, UICollectionViewDelegate, UICo
         collectionView.dataSource = self
         
         // Register a UICollectionViewCell class
-        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell")
-        
+        let nib = UINib(nibName: "ItemCollectionViewCell", bundle: .main)
+        collectionView.register(nib, forCellWithReuseIdentifier: "ItemCollectionViewCell")
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(collectionView)
         
@@ -119,9 +98,10 @@ class StoreFrontViewController: UIViewController, UICollectionViewDelegate, UICo
         
         // Toolbar buttons
         let buttonProfile = UIBarButtonItem(title: "Profile", style: .plain, target: self, action: #selector(toolbarButtonTapped(_:)))
+        let buttonOrderHistory = UIBarButtonItem(title: "OrderHistory", style: .plain, target: self, action: #selector(toolbarButtonTapped(_:)))
         let buttonMap = UIBarButtonItem(title: "Map", style: .plain, target: self, action: #selector(toolbarButtonTapped(_:)))
         
-        let toolbarItems = [buttonProfile, flexibleSpace, buttonMap]
+        let toolbarItems = [buttonProfile, flexibleSpace, buttonOrderHistory, flexibleSpace, buttonMap]
         
         toolbar.setItems(toolbarItems, animated: false)
         
@@ -138,10 +118,14 @@ class StoreFrontViewController: UIViewController, UICollectionViewDelegate, UICo
     }
     
     // MARK: - Toolbar Button Actions
-    @objc override func toolbarButtonTapped(_ sender: UIBarButtonItem) {
+    @objc func toolbarButtonTapped(_ sender: UIBarButtonItem) {
         if sender.title == "Profile" {
             let profileVC = ProfileViewController()
             navigationController?.pushViewController(profileVC, animated: true)
+        } else if sender.title == "OrderHistory" {
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            let vc = storyboard.instantiateViewController(withIdentifier: "OrderHistoryViewController")
+            navigationController?.pushViewController(vc, animated: true)
         } else if sender.title == "Map" {
             let mapVC = MapViewController()
             navigationController?.pushViewController(mapVC, animated: true)
@@ -150,39 +134,33 @@ class StoreFrontViewController: UIViewController, UICollectionViewDelegate, UICo
     
     // MARK: - UICollectionView Methods
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 8 // Display 8 items
+        return listItems.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
-        cell.backgroundColor = .systemBlue
-        
-        // Label for each item
-        let label = UILabel(frame: cell.contentView.bounds)
-        label.text = "Item \(indexPath.item + 1)"
-        label.textAlignment = .center
-        label.textColor = .white
-        label.font = UIFont.boldSystemFont(ofSize: 16)
-        cell.contentView.addSubview(label)
-        
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ItemCollectionViewCell", for: indexPath) as! ItemCollectionViewCell
+    
+        cell.lbName.text = listItems[indexPath.item].name
         return cell
     }
     
     // MARK: - DidSelectItemAt for Cell Selection
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let item = listItems[indexPath.item]
         // Display the first alert asking if the user wants to purchase
-        let alert = UIAlertController(title: "Purchase", message: "Do you want to purchase for 10 point?", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Purchase", message: "Do you want to purchase " + item.name + " for " + String(item.point) + " point?", preferredStyle: .alert)
         
         // "Yes" action
         let yesAction = UIAlertAction(title: "Yes", style: .default) { _ in
             // Show another alert indicating the item has been purchased
-            if UserModel.shared.point < 10 {
-                let purchaseAlert = UIAlertController(title: "Don't enough point!", message: nil, preferredStyle: .alert)
+            if UserModel.shared.point < item.point {
+                let purchaseAlert = UIAlertController(title: "Don't enough point!", message: "You haven't enough point! Please reach treasure!", preferredStyle: .alert)
                 purchaseAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
                 self.present(purchaseAlert, animated: true, completion: nil)
                 return
             }
-            UserModel.shared.point -= 10
+            UserModel.shared.point = UserModel.shared.point - item.point
+            UserModel.shared.listItemPurchased.append(item)
             self.updateLabelPoints()
             let purchaseAlert = UIAlertController(title: "Purchased!", message: nil, preferredStyle: .alert)
             purchaseAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))

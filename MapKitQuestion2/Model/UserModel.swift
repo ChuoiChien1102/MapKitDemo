@@ -13,6 +13,7 @@ class UserModel {
     var passWord: String?
     var point = 0
     var isLogin = false
+    var listItemPurchased = [Item]()
     
     private init() { }
 }

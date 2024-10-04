@@ -16,11 +16,16 @@ protocol LocationManagerDelegate: AnyObject {
     func showNoMovementAlert()
 }
 
+protocol LocationManagerToStoreVCDelegate: AnyObject {
+    func didReachTreasure()
+}
+
 class LocationManager: NSObject, CLLocationManagerDelegate {
     static let shared = LocationManager()
     
     var locationMG = CLLocationManager()
     weak var delegate: LocationManagerDelegate?
+    weak var toStoreVCdelegate: LocationManagerToStoreVCDelegate?
     
     var treasureLocation: CLLocation?
     var startTime: Date?
@@ -125,6 +130,7 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
                 if distanceRemaining <= 10 {
                     UserModel.shared.point += 10
                     delegate?.didReachTreasure()
+                    toStoreVCdelegate?.didReachTreasure()
                     stopNoMovementTimer()
                     locationMG.stopUpdatingLocation()
                 }

@@ -12,12 +12,12 @@ import CoreLocation
 extension MapViewController: LoginViewControllerDelegate {
     
     func didLoginSuccessfully() {
-        setupToolbar()
+    
     }
 }
 
 
-class MapViewController: UIViewController, MKMapViewDelegate, LocationManagerDelegate, CLLocationManagerDelegate {
+class MapViewController: UIViewController, MKMapViewDelegate, LocationManagerDelegate {
     
     var treasureManager = TreasureManager() // Treasure manager for handling treasure generation
     var mapView: MKMapView! // MapView instance to display the map
@@ -44,9 +44,7 @@ class MapViewController: UIViewController, MKMapViewDelegate, LocationManagerDel
         
         // Setup map view
         setupMapView()
-        
         setupToolbar()
-        
         // Set Location Manager delegate
         LocationManager.shared.delegate = self
         
@@ -72,11 +70,6 @@ class MapViewController: UIViewController, MKMapViewDelegate, LocationManagerDel
         containerView.addSubview(pointsLabel)
     }
     
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if let destinationVC = segue.destination as? StoreFrontViewController {
-            destinationVC.pointsLabel = pointsLabel
-        }
-    }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.isToolbarHidden = false
@@ -171,16 +164,7 @@ class MapViewController: UIViewController, MKMapViewDelegate, LocationManagerDel
         
         self.view.addSubview(restartButton)
     }
-    
-    // CLLocationManagerDelegate method to handle location updates
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let location = locations.last else { return }
         
-        // Center the map on the user's location
-        let region = MKCoordinateRegion(center: location.coordinate, latitudinalMeters: 500, longitudinalMeters: 500)
-        mapView.setRegion(region, animated: true)
-    }
-    
     // LocationManagerDelegate methods
     func didUpdateVelocity(_ velocity: Double) {
         velocityLabel.text = String(format: "Velocity: %.2f m/s", velocity)
@@ -286,34 +270,20 @@ class MapViewController: UIViewController, MKMapViewDelegate, LocationManagerDel
             LocationManager.shared.locationMG.startUpdatingLocation()
         }
     }
-}
-
-extension UIViewController {
+    
     
     func setupToolbar() {
         let toolbar = UIToolbar()
         toolbar.translatesAutoresizingMaskIntoConstraints = false
-        
-        let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        
-        // Toolbar buttons
-        if UserModel.shared.isLogin {
-            // if user is login
-            let buttonProfile = UIBarButtonItem(title: "Profile", style: .plain, target: self, action: #selector(toolbarButtonTapped(_:)))
-            let buttonMap = UIBarButtonItem(title: "Map", style: .plain, target: self, action: #selector(toolbarButtonTapped(_:)))
-            let toolbarItems = [buttonProfile, flexibleSpace, buttonMap]
-            toolbar.setItems(toolbarItems, animated: false)
-        } else {
-            // If user no login
+        if !UserModel.shared.isLogin {
+            // Toolbar buttons
             let buttonLogin = UIBarButtonItem(title: "Login", style: .plain, target: self, action: #selector(toolbarButtonTapped(_:)))
-            let buttonMap = UIBarButtonItem(title: "Map", style: .plain, target: self, action: #selector(toolbarButtonTapped(_:)))
-            let toolbarItems = [buttonLogin, flexibleSpace, buttonMap]
+            let toolbarItems = [buttonLogin]
             toolbar.setItems(toolbarItems, animated: false)
         }
         
         // Add the toolbar to the view
         view.addSubview(toolbar)
-        
         // Add constraints to position the toolbar at the bottom
         NSLayoutConstraint.activate([
             toolbar.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
@@ -324,19 +294,9 @@ extension UIViewController {
     }
     
     @objc func toolbarButtonTapped(_ sender: UIBarButtonItem) {
-        if sender.title == "Login" {
-            let loginVC = LoginViewController()
-            if let mainVC = self as? MapViewController {
-                loginVC.delegate = mainVC  // Set the delegate to receive login success
-            }
-            navigationController?.pushViewController(loginVC, animated: true)
-        } else if sender.title == "Profile" {
-            let profileVC = ProfileViewController()
-            navigationController?.pushViewController(profileVC, animated: true)
-        } else if sender.title == "Map" {
-            // Navigate back to the root view controller (ViewController)
-            navigationController?.popToRootViewController(animated: true)
-        }
-        
+        let loginVC = LoginViewController()
+        loginVC.delegate = self
+        navigationController?.pushViewController(loginVC, animated: true)
     }
 }
+
